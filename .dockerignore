@@ -1,0 +1,27 @@
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build output
+dist
+coverage
+
+# Environment files
+.env
+.env.* 
+
+# OS / Editor files
+.DS_Store
+*.swp
+*.swo
+.idea
+.vscode
+*.log
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
