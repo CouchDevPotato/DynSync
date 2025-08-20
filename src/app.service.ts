@@ -9,7 +9,7 @@ import { firstValueFrom } from 'rxjs';
 export class AppService {
   private readonly log = new Logger(AppService.name);
   private ovhDynDNSUrl = 'https://dns.eu.ovhapis.com/nic/update?system=dyndns';
-  private ovhHostname;
+  private ovhHostname: string;
   private ovhAuth: AxiosBasicCredentials;
 
   constructor(
@@ -28,15 +28,17 @@ export class AppService {
 
   @Cron('15 */3 * * *') // every 3 hours at x:15 eg. 0:15, 3:15, ...
   async checkOwnIp() {
-    const ip1 = await this.myip();
-    const ip2 = await this.myexternalip();
+    const extIP = this.match2(
+      await this.myip(),
+      await this.myexternalip(),
+      await this.ipify()
+    );
 
-    if (ip1 != ip2) {
-      this.log.debug(`Unclear state. IP1: ${ip1}  ---  IP2: ${ip2}`);
+    if (!extIP) {
+      this.log.debug(`Unclear state. No matching IPs`);
       return;
     }
-
-    const extIP = ip1;
+    
     this.log.debug(`My current IP is: ${extIP}`);
 
     const updateUrl = `${this.ovhDynDNSUrl}&hostname=${this.ovhHostname}&myip=${extIP}`;
@@ -63,8 +65,30 @@ export class AppService {
     return data.ip;
   }
 
+  private async ipify(): Promise<string> {
+    const url = 'https://api.ipify.org?format=json';
+    type ipifyType = {
+      ip: string
+    }
+    const data: ipifyType= (await this.getData(url)) as ipifyType;
+    
+    return data.ip;
+  }
+
   private async getData(url: string): Promise<unknown> {
     const response = await firstValueFrom(this.httpService.get(url));
     return response.data as object;
+  }
+
+  private match2(a: string, b: string, c: string): string | null {
+    if (a === b || a === c) {
+      return a; 
+    }
+
+    if (b === c) {
+      return b; 
+    }
+
+    return null;
   }
 }
