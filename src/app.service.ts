@@ -4,6 +4,9 @@ import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import { AxiosBasicCredentials } from 'axios';
 import { firstValueFrom } from 'rxjs';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Injectable()
 export class AppService {
@@ -26,7 +29,7 @@ export class AppService {
     };
   }
 
-  @Cron('15 */3 * * *') // every 3 hours at x:15 eg. 0:15, 3:15, ...
+  @Cron(process.env.CRON_INTERVAL ?? '0 */1 * * *')
   async checkOwnIp() {
     const extIP = this.match2(
       await this.myip(),
