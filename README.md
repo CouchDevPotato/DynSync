@@ -10,3 +10,8 @@ docker buildx build . -t DynSync
 ```bash
 docker run DynSync
 ```
+
+## How to start with docker-compose
+```bash
+docker compose up
+```
