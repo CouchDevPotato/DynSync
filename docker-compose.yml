@@ -1,0 +1,10 @@
+services:
+  dynsync:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dynsync:latest
+    container_name: dynsync
+    ports:
+      - "3000:3000"
+    restart: always
